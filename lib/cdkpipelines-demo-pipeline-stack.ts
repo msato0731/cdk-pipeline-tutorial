@@ -1,3 +1,4 @@
+import { ShellScriptAction } from "@aws-cdk/pipelines"
 import { CdkpipelinesDemoStage } from "./cdkpipelines-demo-stage"
 import * as codepipeline from "@aws-cdk/aws-codepipeline"
 import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions"
@@ -31,6 +32,19 @@ export class CdkpipelinesDemoPipelineStack extends Stack {
     })
     pipeline.addApplicationStage(new CdkpipelinesDemoStage(this, "PreProd", {
       env: { account: "ACCOUNT1", region: "ap-northeast-1" }
+    }))
+    const preprod = new CdkpipelinesDemoStage(this, "PreProd", {
+      env: { account: "ACCOUNT1", region: "ap-northeast-1"}
+    })
+    const preprodStage = pipeline.addApplicationStage(preprod)
+    preprodStage.addActions(new ShellScriptAction({
+      actionName: "TestService",
+      useOutputs: {
+        ENDPOINT_URL: pipeline.stackOutput(preprod.urlOutput)
+      },
+      commands: [
+        "curl -Ssf $ENDPOINT_URL"
+      ]
     }))
   }
 }
