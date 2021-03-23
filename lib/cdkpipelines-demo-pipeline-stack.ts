@@ -1,7 +1,9 @@
+import { CdkpipelinesDemoStage } from "./cdkpipelines-demo-stage"
 import * as codepipeline from "@aws-cdk/aws-codepipeline"
 import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions"
 import { Construct, SecretValue, Stack, StackProps } from "@aws-cdk/core"
 import { CdkPipeline, SimpleSynthAction } from "@aws-cdk/pipelines"
+// import { pipeline } from "stream"
 
 export class CdkpipelinesDemoPipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -25,7 +27,10 @@ export class CdkpipelinesDemoPipelineStack extends Stack {
         cloudAssemblyArtifact,
         buildCommand: 'npm run build'
       })
-
+    // This is where we add the application stages
     })
+    pipeline.addApplicationStage(new CdkpipelinesDemoStage(this, "PreProd", {
+      env: { account: "ACCOUNT1", region: "us-east-2" }
+    }))
   }
 }
